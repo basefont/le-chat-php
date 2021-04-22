@@ -2813,8 +2813,8 @@ function passreset(string $nick, string $pass) : string {
 	$stmt->execute([$nick, $U['status']]);
 	if($stmt->fetch(PDO::FETCH_ASSOC)){
 		$passhash=password_hash($pass, PASSWORD_DEFAULT);
-		$stmt=$db->prepare('UPDATE ' . PREFIX . 'members SET passhash=? WHERE nickname=?;');
-		$stmt->execute([$passhash, $nick]);
+		$stmt=$db->prepare('UPDATE ' . PREFIX . 'members SET passhash=?, loginfails=? WHERE nickname=?;');
+		$stmt->execute([$passhash, 0, $nick]);
 		$stmt=$db->prepare('UPDATE ' . PREFIX . 'sessions SET passhash=? WHERE nickname=?;');
 		$stmt->execute([$passhash, $nick]);
 		return sprintf($I['succpassreset'], htmlspecialchars($nick));
@@ -2924,8 +2924,8 @@ function save_profile() : string {
 		$U['passhash']=$U['newhash'];
 		$stmt=$db->prepare('UPDATE ' . PREFIX . 'sessions SET passhash=? WHERE session=?;');
 		$stmt->execute([$U['passhash'], $U['session']]);
-		$stmt=$db->prepare('UPDATE ' . PREFIX . 'members SET passhash=? WHERE nickname=?;');
-		$stmt->execute([$U['passhash'], $U['nickname']]);
+		$stmt=$db->prepare('UPDATE ' . PREFIX . 'members SET passhash=?, loginfails=? WHERE nickname=?;');
+		$stmt->execute([$U['passhash'], 0, $U['nickname']]);
 	}
 	if($U['status']>1 && !empty($_POST['newnickname'])){
 		$msg=set_new_nickname();
